@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobi World Plassey - Premium Mobile Shop</title>
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-gradient: linear-gradient(135deg, #ff416c, #ff4b2b);
+            --bg-color: #f7f9fc;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); margin: 0; padding: 0; padding-bottom: 80px; color: var(--text-main); overflow-x: hidden; }
+        
+        /* Header Animation */
+        header { background: var(--primary-gradient); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(229, 57, 53, 0.3); animation: slideDown 0.5s ease; }
+        @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .shop-title { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .admin-link { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(5px); color: white; padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: bold; border: 1px solid rgba(255,255,255,0.4); transition: 0.3s; }
+        .admin-link:hover { background: white; color: var(--primary); }
+
+        .search-box { display: flex; background: white; border-radius: 30px; padding: 10px 18px; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.3s; }
+        .search-box:focus-within { box-shadow: 0 4px 20px rgba(0,0,0,0.15); transform: scale(1.01); }
+        .search-box input { border: none; outline: none; width: 100%; font-size: 14px; margin-left: 10px; background: transparent; color: #333; }
+
+        .container { padding: 15px; max-width: 600px; margin: auto; }
+
+        /* 3 Second Banner Slider Container */
+        .slider-container { width: 100%; height: 180px; border-radius: 16px; overflow: hidden; position: relative; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); background: #eee; animation: fadeIn 0.8s ease; }
+        .slide { width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out; transform: scale(1.05); }
+        .slide.active { opacity: 1; transform: scale(1); z-index: 2; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; }
+
+        .section-title { font-size: 18px; font-weight: 800; margin: 20px 0 12px 5px; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        
+        /* Grid & Cards Animation */
+        .phone-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .phone-card { background: var(--card-bg); border-radius: 16px; padding: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); position: relative; animation: fadeInUp 0.5s ease forwards; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(0,0,0,0.04); transition: transform 0.3s, box-shadow 0.3s; }
+        .phone-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+        
+        .wishlist-btn { position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 14px; z-index: 5; transition: 0.2s; }
+        .wishlist-btn:active { transform: scale(0.85); }
+
+        /* Pro Big Image Frame */
+        .phone-img-container { width: 100%; height: 180px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; background: radial-gradient(circle, #fcfcfc 0%, #f1f3f6 100%); border-radius: 12px; border: 1px solid #edf2f7; overflow: hidden; position: relative; }
+        .phone-card img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.4s ease; padding: 5px; box-sizing: border-box; }
+        .phone-card img:hover { transform: scale(1.08); }
+
+        .badge { background: #e0f2fe; color: #0284c7; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .phone-title { font-size: 14px; font-weight: 700; margin: 4px 0; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 38px; line-height: 1.3; }
+        .phone-specs { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+        .phone-desc { font-size: 11px; color: #4b5563; background: #f8fafc; padding: 8px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid var(--primary); max-height: 55px; overflow: hidden; line-height: 1.4; }
+        
+        /* Flipkart Style Pricing */
+        .price-box { margin-bottom: 10px; }
+        .price-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+        .current-price { color: var(--primary); font-size: 17px; font-weight: 800; }
+        .original-price { font-size: 12px; color: #9ca3af; text-decoration: line-through; }
+        .discount-tag { font-size: 10px; color: #16a34a; background: #dcfce7; padding: 2px 6px; border-radius: 4px; font-weight: 800; }
+
+        .whatsapp-btn { background: #25D366; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; box-shadow: 0 4px 12px rgba(37,211,102,0.35); transition: 0.2s; }
+        .whatsapp-btn:hover { background: #20ba5a; transform: translateY(-1px); }
+
+        /* Premium Address Footer */
+        .address-footer { background: linear-gradient(135deg, #1e1b4b, #312e81); color: #fff; border-radius: 20px; padding: 25px 20px; margin-top: 35px; text-align: center; box-shadow: 0 10px 30px rgba(49, 46, 129, 0.25); position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        .address-footer::before { content: ''; position: absolute; top: -50px; left: -50px; width: 120px; height: 120px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+        .address-footer h3 { margin: 0 0 10px 0; font-size: 18px; color: #38bdf8; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+        .address-footer p { margin: 5px 0; font-size: 13px; color: #e2e8f0; line-height: 1.5; font-weight: 500; }
+        .address-footer .highlight-loc { color: #facc15; font-weight: 700; }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 1000; }
+        .nav-item { text-align: center; text-decoration: none; color: #9ca3af; font-size: 11px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: 0.2s; }
+        .nav-item.active { color: var(--primary); transform: translateY(-2px); }
+        .nav-item span { font-size: 20px; }
+
+        .no-phone { grid-column: span 2; text-align: center; font-size: 15px; color: var(--text-muted); margin-top: 40px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <h1 class="shop-title">📱 Mobi World</h1>
+            <a href="admin.html" class="admin-link">⚙️ Admin</a>
+        </div>
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="search-input" placeholder="Search brands, models..." onkeyup="filterPhones()">
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 3s Auto Sliding Banner Section -->
+        <div class="slider-container" id="banner-slider">
+            <!-- Dynamic Banners will load here -->
+        </div>
+
+        <div class="section-title">🔥 Live Stock Collection</div>
+        <div id="phone-list" class="phone-grid">
+            <p class="no-phone">Loading premium stock...</p>
+        </div>
+
+        <!-- Premium Store Address Footer -->
+        <div class="address-footer">
+            <h3>📍 Visit Our Store</h3>
+            <p><span class="highlight-loc">Mobi World Plassey</span></p>
+            <p>Mira High School Road, Near Art Gallery</p>
+            <p style="font-size: 11px; color: #94a3b8; margin-top: 10px;">✨ Best Price & Genuine Products Guaranteed ✨</p>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item active"><span>🏠</span>Home</a>
+        <a href="admin.html" class="nav-item"><span>🛠️</span>Admin</a>
+        <a href="https://wa.me/919088220753" target="_blank" class="nav-item"><span>💬</span>Contact</a>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbwiDSo8tOQ7MwHO344Ij1DSb9cKUmf121PXUyrey7VeMH2_dcM6Tswwak6YUo37oDiB/exec";
+        const WHATSAPP_NUMBER = "919088220753";
+        let allPhones = [];
+        let bannersList = [];
+        let currentSlide = 0;
+        let slideInterval;
+
+        async function loadData() {
+            try {
+                let res = await fetch(API_URL);
+                let data = await res.json();
+                
+                // Handle new JSON response format
+                if (data.phones) {
+                    allPhones = data.phones;
+                    bannersList = data.banners || [];
+                } else {
+                    allPhones = data; // Backward compatibility
+                }
+
+                displayPhones(allPhones);
+                initBanners();
+            } catch (err) {
+                document.getElementById("phone-list").innerHTML = `<p class="no-phone">Error connecting to server.</p>`;
+            }
+        }
+
+        function initBanners() {
+            let sliderDiv = document.getElementById("banner-slider");
+            if (!bannersList || bannersList.length === 0) return;
+
+            let html = "";
+            bannersList.forEach((bUrl, idx) => {
+                let activeClass = idx === 0 ? "active" : "";
+                html += `<div class="slide ${activeClass}"><img src="${bUrl.trim()}" alt="Banner ${idx+1}" onerror="this.src='https://via.placeholder.com/600x200?text=Mobi+World'"></div>`;
+            });
+            sliderDiv.innerHTML = html;
+
+            // Start 3 Seconds Auto Slide Timer
+            if (bannersList.length > 1) {
+                if(slideInterval) clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, 3000);
+            }
+        }
+
+        function nextSlide() {
+            let slides = document.querySelectorAll(".slide");
+            if(slides.length === 0) return;
+            slides[currentSlide].classList.remove("active");
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add("active");
+        }
+
+        function displayPhones(phones) {
+            let listDiv = document.getElementById("phone-list");
+            if(!phones || phones.length === 0) {
+                listDiv.innerHTML = `<p class="no-phone">Kono phone paoya jayni!</p>`;
+                return;
+            }
+
+            let html = "";
+            phones.forEach(p => {
+                let model = p.model || 'Phone';
+                let price = Number(p.price) || 0;
+                let oldprice = Number(p.oldprice) || 0;
+                let ramrom = p.ramrom || '';
+                let color = p.color || '';
+                let condition = p.condition || 'Fresh';
+                let description = p.description || '';
+                
+                let rawImage = p.image || '';
+                let image = rawImage.trim();
+
+                if (image.includes("ibb.co/") && !image.includes("i.ibb.co")) {
+                    let parts = image.split('/');
+                    let id = parts[parts.length - 1];
+                    image = `https://i.ibb.co/${id}/image.jpg`;
+                }
+
+                if (!image.startsWith('http')) {
+                    image = 'https://via.placeholder.com/150';
+                }
+
+                let msg = encodeURIComponent(`I want to buy ${model} (Price: ৳${price}) from Mobi World Plassey.`);
+                
+                let priceHtml = `<div class="current-price">৳${price}</div>`;
+                if (oldprice && oldprice > price) {
+                    let diff = oldprice - price;
+                    let discountPercent = Math.round((diff / oldprice) * 100);
+                    priceHtml = `
+                        <div class="price-row">
+                            <span class="current-price">৳${price}</span>
+                            <span class="original-price">৳${oldprice}</span>
+                            <span class="discount-tag">${discountPercent}% OFF</span>
+                        </div>
+                    `;
+                }
+
+                let descHtml = description ? `<div class="phone-desc">${description}</div>` : '';
+                let specsText = [ramrom, color].filter(Boolean).join(' | ');
+                let specsHtml = specsText ? `<div class="phone-specs">${specsText}</div>` : '';
+                
+                html += `
+                    <div class="phone-card">
+                        <button class="wishlist-btn" onclick="this.innerHTML = this.innerHTML === '❤️' ? '🤍' : '❤️'">🤍</button>
+                        <div class="phone-img-container">
+                            <img src="${image}" alt="${model}" onerror="this.src='https://via.placeholder.com/150'">
+                        </div>
+                        <div>
+                            <span class="badge">${condition}</span>
+                            <div class="phone-title">${model}</div>
+                            ${specsHtml}
+                            ${descHtml}
+                        </div>
+                        <div class="price-box">
+                            ${priceHtml}
+                            <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${msg}" class="whatsapp-btn" target="_blank">💬 Buy on WhatsApp</a>
+                        </div>
+                    </div>
+                `;
+            });
+            listDiv.innerHTML = html;
+        }
+
+        function filterPhones() {
+            let query = document.getElementById("search-input").value.toLowerCase();
+            let filtered = allPhones.filter(p => {
+                let m = (p.model || '').toLowerCase();
+                let c = (p.color || '').toLowerCase();
+                let r = (p.ramrom || '').toLowerCase();
+                return m.includes(query) || c.includes(query) || r.includes(query);
+            });
+            displayPhones(filtered);
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
