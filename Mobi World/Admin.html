@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobi World - Admin Panel</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 15px; }
+        
+        #admin-lock-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #0f172a; z-index: 999999; display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .lock-card { background: #1e293b; padding: 25px; border-radius: 16px; width: 100%; max-width: 320px; border: 2px solid #f59e0b; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .lock-input { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #f59e0b; border-radius: 8px; color: white; font-size: 14px; margin-bottom: 15px; box-sizing: border-box; text-align: center; outline: none; }
+        .lock-btn { background: #f59e0b; color: #0f172a; border: none; padding: 10px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
+
+        #admin-main-content { display: none; }
+        .admin-container { max-width: 700px; margin: auto; padding-bottom: 50px; }
+        .admin-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334155; padding-bottom: 10px; margin-bottom: 15px; }
+        h2 { color: #fbbf24; margin: 0; font-size: 18px; }
+        .back-store-btn { background: #334155; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; text-decoration: none; }
+
+        .card { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px; font-weight: bold; }
+        .form-control { width: 100%; padding: 8px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: white; font-size: 13px; box-sizing: border-box; }
+        
+        .stock-row, .banner-row { display: flex; align-items: center; justify-content: space-between; background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #334155; gap: 8px; }
+        .stock-info, .banner-info { flex-grow: 1; word-break: break-all; font-size: 12px; color: #fff; }
+        
+        .btn-group { display: flex; gap: 4px; flex-shrink: 0; }
+        .action-btn { background: #334155; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .btn-save { background: #22c55e; width: 100%; padding: 12px; font-size: 15px; margin-top: 10px; font-weight: bold; cursor: pointer; border: none; border-radius: 8px; color: white; }
+        .btn-delete { background: #ef4444; }
+        .btn-edit { background: #eab308; color: #0f172a; }
+
+        .login-log-item { background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 6px; border-left: 3px solid #f59e0b; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+
+    <div id="admin-lock-screen">
+        <div class="lock-card">
+            <h2>🔒 Admin Access</h2>
+            <p style="font-size: 11px; color: #94a3b8; margin-bottom: 12px;">Enter password (mobiW0RLD@2026)</p>
+            <input type="password" id="admin-pass-input" class="lock-input" placeholder="Password">
+            <button class="lock-btn" onclick="verifyAdminPassword()">UNLOCK PANEL 🚀</button>
+        </div>
+    </div>
+
+    <div class="admin-container" id="admin-main-content">
+        <div class="admin-header-row">
+            <h2>⚙️ Mobi World Admin</h2>
+            <a href="index.html" class="back-store-btn">🏠 Back to Store</a>
+        </div>
+        
+        <div class="card">
+            <h3>🖼️ Manage Unlimited Puja Banners</h3>
+            <div class="form-group">
+                <label>Add Unlimited Banner Image URL (ImgBB link)</label>
+                <input type="text" id="new-banner-url" class="form-control" placeholder="https://i.ibb.co/...">
+            </div>
+            <button class="action-btn btn-save" style="margin-top:0; background:#f59e0b; color:#0f172a;" onclick="addNewBanner()">➕ Add Unlimited Banner</button>
+            <div id="admin-banner-list" style="margin-top: 15px;">Loading banners...</div>
+            <button class="action-btn btn-save" onclick="saveBanners()">💾 Save Banners to App</button>
+        </div>
+
+        <div class="card">
+            <h3 id="form-heading">➕ Add New Phone to Stock</h3>
+            <input type="hidden" id="edit-index" value="-1">
+            <div class="form-group"><label>Model Name</label><input type="text" id="new-model" class="form-control" placeholder="Vivo V40"></div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex:1;"><label>Offer Price (৳)</label><input type="number" id="new-price" class="form-control" placeholder="23900"></div>
+                <div class="form-group" style="flex:1;"><label>Regular Price (৳)</label><input type="number" id="new-oldprice" class="form-control" placeholder="29900"></div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex:1;"><label>RAM / ROM</label><input type="text" id="new-ramrom" class="form-control" placeholder="8/256 GB"></div>
+                <div class="form-group" style="flex:1;"><label>Color</label><input type="text" id="new-color" class="form-control" placeholder="Blue"></div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex:1;"><label>Condition</label><input type="text" id="new-condition" class="form-control" placeholder="Fresh"></div>
+                <div class="form-group" style="flex:1;"><label>Status</label><select id="new-status" class="form-control"><option value="Available">Available</option><option value="Sold Out">Sold Out</option></select></div>
+            </div>
+            <div class="form-group"><label>Image URL</label><input type="text" id="new-image" class="form-control" placeholder="https://..."></div>
+            <div class="form-group"><label>Description / Gift Info</label><textarea id="new-desc" class="form-control" rows="2" placeholder="Puja Gift details..."></textarea></div>
+            <button class="action-btn btn-save" id="submit-phone-btn" onclick="saveOrAddPhone()">➕ Add Phone to List</button>
+        </div>
+
+        <div class="card">
+            <h3>📱 Live Stock & Rearrange / Edit / Delete</h3>
+            <div id="admin-stock-list">Loading stock...</div>
+            <button class="action-btn btn-save" onclick="saveStockOrder()">💾 Save Stock Changes to App</button>
+        </div>
+
+        <div class="card">
+            <h3>👥 Customer Logins Log (Every Visit with Date & Time)</h3>
+            <div id="customer-log-box">Loading customer logs...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbwiDSo8tOQ7MwHO344Ij1DSb9cKUmf121PXUyrey7VeMH2_dcM6Tswwak6YUo37oDiB/exec";
+        let adminPhones = [], adminBanners = [], adminLogins = [];
+
+        function verifyAdminPassword() {
+            if(document.getElementById('admin-pass-input').value.trim() === "mobiW0RLD@2026") {
+                document.getElementById('admin-lock-screen').style.display = 'none';
+                document.getElementById('admin-main-content').style.display = 'block';
+                fetchAdminData();
+            } else { alert("Incorrect Password!"); }
+        }
+
+        async function fetchAdminData() {
+            try {
+                let res = await fetch(API_URL);
+                let data = await res.json();
+                adminPhones = data.phones || [];
+                adminBanners = data.banners || [];
+                adminLogins = data.users || data.logins || [];
+                renderAdminBanners();
+                renderAdminStock();
+                renderCustomerLogs();
+            } catch(e){}
+        }
+
+        function renderAdminBanners() {
+            let container = document.getElementById('admin-banner-list');
+            if(adminBanners.length === 0) { container.innerHTML = '<div style="color:#94a3b8; text-align:center; font-size:12px;">No active banners. Add unlimited banners above!</div>'; return; }
+            let html = '';
+            adminBanners.forEach((b, index) => {
+                html += `<div class="banner-row"><div class="banner-info">🖼️ ${b}</div><button class="action-btn btn-delete" onclick="adminBanners.splice(${index},1); renderAdminBanners()">🗑️</button></div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function addNewBanner() {
+            let url = document.getElementById('new-banner-url').value.trim();
+            if(!url) { alert("Doya kore banner-er image URL din!"); return; }
+            adminBanners.push(url);
+            document.getElementById('new-banner-url').value = '';
+            renderAdminBanners();
+        }
+
+        async function saveBanners() {
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ banners: adminBanners, phones: adminPhones }) });
+            alert('Unlimited Banners updated successfully! 🚀'); fetchAdminData();
+        }
+
+        function renderAdminStock() {
+            let container = document.getElementById('admin-stock-list');
+            if(adminPhones.length === 0) { container.innerHTML = '<div style="color:#94a3b8; text-align:center;">No phones found in stock.</div>'; return; }
+            let html = '';
+            adminPhones.forEach((p, index) => {
+                html += `
+                    <div class="stock-row">
+                        <div class="stock-info"><strong>${p.model}</strong><br><span style="color:#94a3b8">৳${p.price} | ${p.status}</span></div>
+                        <div class="btn-group">
+                            <button class="action-btn" onclick="moveItem(${index}, -1)">⬆️</button>
+                            <button class="action-btn" onclick="moveItem(${index}, 1)">⬇️</button>
+                            <button class="action-btn btn-edit" onclick="editItem(${index})">✏️</button>
+                            <button class="action-btn btn-delete" onclick="adminPhones.splice(${index},1); renderAdminStock()">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function moveItem(index, direction) {
+            let target = index + direction;
+            if (target < 0 || target >= adminPhones.length) return;
+            let temp = adminPhones[index]; adminPhones[index] = adminPhones[target]; adminPhones[target] = temp;
+            renderAdminStock();
+        }
+
+        function editItem(index) {
+            let p = adminPhones[index];
+            document.getElementById('edit-index').value = index;
+            document.getElementById('new-model').value = p.model || '';
+            document.getElementById('new-price').value = p.price || '';
+            document.getElementById('new-oldprice').value = p.oldprice || '';
+            document.getElementById('new-ramrom').value = p.ramrom || '';
+            document.getElementById('new-color').value = p.color || '';
+            document.getElementById('new-condition').value = p.condition || '';
+            document.getElementById('new-status').value = p.status || 'Available';
+            document.getElementById('new-image').value = p.image || '';
+            document.getElementById('new-desc').value = p.description || '';
+            document.getElementById('form-heading').innerText = '✏️ Edit Phone: ' + p.model;
+            document.getElementById('submit-phone-btn').innerText = '💾 Update Phone';
+        }
+
+        function saveOrAddPhone() {
+            let idx = parseInt(document.getElementById('edit-index').value);
+            let pData = {
+                model: document.getElementById('new-model').value.trim(),
+                price: document.getElementById('new-price').value.trim(),
+                oldprice: document.getElementById('new-oldprice').value.trim(),
+                ramrom: document.getElementById('new-ramrom').value.trim(),
+                color: document.getElementById('new-color').value.trim(),
+                condition: document.getElementById('new-condition').value.trim(),
+                status: document.getElementById('new-status').value,
+                image: document.getElementById('new-image').value.trim(),
+                description: document.getElementById('new-desc').value.trim()
+            };
+            if(!pData.model || !pData.price) { alert("Model & Price din!"); return; }
+
+            if(idx >= 0) adminPhones[idx] = pData;
+            else adminPhones.unshift(pData);
+
+            document.getElementById('edit-index').value = '-1';
+            document.getElementById('form-heading').innerText = '➕ Add New Phone to Stock';
+            document.getElementById('submit-phone-btn').innerText = '➕ Add Phone to List';
+            document.getElementById('new-model').value = ''; document.getElementById('new-price').value = '';
+            renderAdminStock();
+            alert("Phone updated locally! Click 'Save Stock Changes to App'.");
+        }
+
+        function renderCustomerLogs() {
+            let logBox = document.getElementById('customer-log-box');
+            if(!adminLogins || adminLogins.length === 0) { logBox.innerHTML = '<div style="color:#94a3b8; text-align:center; padding:10px;">No customer data found.</div>'; return; }
+            let html = '';
+            [...adminLogins].reverse().forEach(l => {
+                html += `
+                    <div class="login-log-item">
+                        <div>
+                            <strong style="color:#fff; font-size:13px;">👤 ${l.name || 'Unknown'}</strong><br>
+                            <span style="color:#38bdf8;">📞 ${l.phone || 'N/A'}</span>
+                        </div>
+                        <div style="font-size:11px; color:#fbbf24; text-align:right; font-weight:bold;">🕒 ${l.time || 'N/A'}</div>
+                    </div>
+                `;
+            });
+            logBox.innerHTML = html;
+        }
+
+        async function saveStockOrder() {
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ phones: adminPhones, banners: adminBanners }) });
+            alert('Stock saved successfully! 🚀'); fetchAdminData();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobi World - পলাশী</title>
+    <style>
+        :root { --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #f59e0b; --gold: #fbbf24; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: auto; padding-bottom: 80px; }
+
+        /* --- PUJA SPECIAL 3D / SPLASH INTRO SCREEN (Every Time App Opens) --- */
+        #auth-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle, #451a03 0%, #1c1917 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999;
+            padding: 20px; box-sizing: border-box; text-align: center; color: var(--gold);
+        }
+        .puja-dhake-icon { font-size: 45px; margin-bottom: 5px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        .auth-card { background: rgba(30, 41, 59, 0.95); border: 2px solid #f59e0b; padding: 22px; border-radius: 20px; width: 100%; max-width: 320px; box-shadow: 0 20px 40px rgba(245, 158, 11, 0.3); backdrop-filter: blur(10px); }
+        .auth-card h2 { margin: 0 0 2px 0; color: #fbbf24; font-size: 22px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .sub-location { font-size: 11px; color: #cbd5e1; font-weight: bold; margin-bottom: 10px; }
+        .puja-tagline { font-size: 11px; color: #f59e0b; font-weight: bold; background: rgba(245, 158, 11, 0.1); padding: 5px; border-radius: 6px; margin-bottom: 12px; border: 1px dashed #f59e0b; }
+        .auth-input { width: 100%; padding: 10px 12px; background: #0f172a; border: 1px solid #f59e0b; border-radius: 8px; color: white; font-size: 13px; margin-bottom: 10px; box-sizing: border-box; outline: none; text-align: center; }
+        .auth-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: #0f172a; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); }
+
+        /* --- LOADING ANIMATION --- */
+        #loading-animation-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.96); z-index: 999999; display: none;
+            flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center;
+        }
+
+        /* --- MAIN APP (GOLDEN PREMIUM E-COMMERCE) --- */
+        #main-app { display: none; }
+        .top-header { background: linear-gradient(135deg, #1e293b, #0f172a); border-bottom: 2px solid #f59e0b; padding: 15px; color: white; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2); }
+        .store-brand { display: flex; flex-direction: column; margin-bottom: 10px; }
+        .brand-name { font-size: 20px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; color: #fbbf24; }
+        .user-welcome-badge { font-size: 11px; background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #fbbf24; padding: 3px 8px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        
+        .search-box { 
+            background: #1e293b; border-radius: 30px; padding: 10px 18px; 
+            display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 2px solid #f59e0b;
+        }
+        .search-box input { border: none; outline: none; width: 100%; font-size: 15px; color: white; background: transparent; font-weight: 600; }
+        .search-box input::placeholder { color: #94a3b8; }
+
+        /* Banner Carousel */
+        .banner-container { width: 100%; height: 210px; overflow: hidden; background: #1e293b; position: relative; display: none; border-bottom: 2px solid #f59e0b; }
+        .banner-slide { width: 100%; height: 100%; display: flex; transition: transform 0.6s ease-in-out; }
+        .banner-slide img { width: 100%; height: 100%; object-fit: cover; flex-shrink: 0; }
+
+        .brand-logos-wrapper { padding: 12px 10px; background: #1e293b; border-bottom: 1px solid #334155; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+        .brand-logos-wrapper::-webkit-scrollbar { display: none; }
+        .brand-pill {
+            background: #0f172a; border: 1px solid #475569; padding: 6px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: bold; color: #cbd5e1; cursor: pointer; white-space: nowrap; transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .brand-pill:hover, .brand-pill.active-pill { background: #f59e0b; color: #0f172a; border-color: #f59e0b; font-weight: bold; box-shadow: 0 3px 10px rgba(245, 158, 11, 0.4); }
+
+        .section-header { padding: 15px 15px 5px 15px; font-size: 16px; font-weight: bold; color: #fbbf24; display: flex; align-items: center; justify-content: space-between; }
+        .reset-filter { font-size: 12px; color: #f59e0b; cursor: pointer; text-decoration: underline; display: none; }
+        
+        .phone-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
+        
+        .phone-card { background: #1e293b; border-radius: 16px; border: 1px solid #334155; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .phone-img-box { width: 100%; height: 140px; background: #0f172a; position: relative; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .phone-img-box img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+        
+        .status-badge { position: absolute; bottom: 8px; left: 8px; font-size: 9px; padding: 3px 6px; border-radius: 6px; font-weight: bold; z-index: 2; }
+        .badge-avail { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-sold { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+
+        .phone-content { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; cursor: pointer; }
+        .phone-title { font-size: 14px; font-weight: bold; margin: 0 0 2px 0; color: #f8fafc; }
+        .phone-ram { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+        .specs-mini { background: #0f172a; border-left: 3px solid #f59e0b; padding: 6px 8px; border-radius: 4px; font-size: 10px; color: #cbd5e1; margin-bottom: 8px; line-height: 1.3; }
+
+        .price-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+        .current-price { font-size: 14px; font-weight: bold; color: #fbbf24; }
+        .old-price { font-size: 11px; color: #94a3b8; text-decoration: line-through; }
+
+        .wa-btn { background: #16a34a; color: white; text-align: center; padding: 7px; border-radius: 8px; font-size: 11px; font-weight: bold; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 4px; margin: 0 10px 10px 10px; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #1e293b; display: flex; justify-content: space-around; padding: 10px 0; border-top: 2px solid #f59e0b; z-index: 99; box-shadow: 0 -4px 12px rgba(0,0,0,0.5); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #94a3b8; font-size: 11px; font-weight: bold; gap: 2px; cursor: pointer; }
+        .nav-item.active, .nav-item:hover { color: #fbbf24; }
+        .nav-item span { font-size: 18px; }
+
+        /* --- PROFILE MODAL --- */
+        #profile-modal {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.8); z-index: 999999; display: none; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;
+        }
+        .profile-card { background: #1e293b; border: 2px solid #f59e0b; padding: 20px; border-radius: 16px; width: 100%; max-width: 320px; text-align: center; }
+
+        /* --- DETAILS PAGE --- */
+        #detail-page {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #0f172a; z-index: 99999; display: none; overflow-y: auto; padding-bottom: 40px;
+        }
+        .detail-header { background: #1e293b; padding: 14px 18px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 10; }
+        .back-home-btn { background: #334155; color: white; border: none; padding: 7px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .detail-body { padding: 18px; max-width: 600px; margin: auto; }
+    </style>
+</head>
+<body>
+
+    <!-- 3D PUJA INTRO SCREEN (Every Time App Opens) -->
+    <div id="auth-screen">
+        <div class="puja-dhake-icon">🪔🥁🙏</div>
+        <div class="auth-card">
+            <h2>MOBI WORLD</h2>
+            <div class="sub-location">Plassey, Nadia</div>
+            <div class="puja-tagline">✨ এবার পুজো মানেই MOBI WORLD! <br>আসুন, অনেক উপহার আর একদম চিপেস্ট প্রাইসে! ✨</div>
+            <p id="auth-instruction-text" style="font-size: 11px; color: #cbd5e1; margin-bottom: 10px;">Enter your details to enter store</p>
+            <div id="auth-inputs-box">
+                <input type="text" id="user-name-input" class="auth-input" placeholder="Apnar Naam (Your Name)">
+                <input type="tel" id="user-phone-input" class="auth-input" placeholder="Mobile Number">
+            </div>
+            <button class="auth-btn" onclick="handleAuthSubmit()">ENTER STORE 🚀</button>
+        </div>
+    </div>
+
+    <!-- PROFILE EDIT MODAL -->
+    <div id="profile-modal">
+        <div class="profile-card">
+            <h3 style="color:#fbbf24; margin-top:0;">👤 Edit Profile</h3>
+            <p style="font-size:11px; color:#94a3b8; margin-bottom:12px;">Apnar nam ba mobile number update korun</p>
+            <input type="text" id="profile-name-edit" class="auth-input" placeholder="Your Name">
+            <input type="tel" id="profile-phone-edit" class="auth-input" placeholder="Mobile Number">
+            <button class="auth-btn" style="margin-top:5px;" onclick="saveProfileChanges()">💾 Save Changes</button>
+            <button onclick="document.getElementById('profile-modal').style.display='none'" style="background:none; border:none; color:#94a3b8; margin-top:10px; cursor:pointer; font-size:12px;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- LOADING ANIMATION -->
+    <div id="loading-animation-overlay">
+        <div style="font-size: 40px; margin-bottom: 15px;">🪔📱</div>
+        <h3 style="margin:0; font-size:18px; color:#fbbf24;">Loading Mobi World Puja Stock...</h3>
+        <p style="font-size:12px; color:#94a3b8; margin-top:5px;">Golden Premium Collection loading...</p>
+    </div>
+
+    <!-- MAIN APP -->
+    <div class="container" id="main-app">
+        <div class="top-header">
+            <div class="store-brand">
+                <span class="brand-name">
+                    <span>📱 Mobi World</span>
+                    <span id="header-user-display" class="user-welcome-badge" onclick="openProfileModal()">👤 Profile</span>
+                </span>
+                <span style="font-size: 11px; color: #f59e0b; font-weight: bold; margin-top:2px;">🪔 Durga Puja Special Edition</span>
+            </div>
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="search-input" placeholder="Search any model (e.g. iPhone, Samsung, Vivo)..." oninput="handleLiveSearch()" onkeyup="handleLiveSearch()">
+            </div>
+        </div>
+
+        <div class="banner-container" id="main-banner-wrapper">
+            <div class="banner-slide" id="banner-slider"></div>
+        </div>
+
+        <div class="brand-logos-wrapper">
+            <div class="brand-pill active-pill" onclick="filterByBrand('All', this)">🔥 All Phones</div>
+            <div class="brand-pill" onclick="filterByBrand('iPhone', this)">🍏 iPhone</div>
+            <div class="brand-pill" onclick="filterByBrand('Samsung', this)">📱 Samsung</div>
+            <div class="brand-pill" onclick="filterByBrand('Realme', this)">⚡ Realme</div>
+            <div class="brand-pill" onclick="filterByBrand('Vivo', this)">🌟 Vivo</div>
+            <div class="brand-pill" onclick="filterByBrand('Oppo', this)">✨ Oppo</div>
+            <div class="brand-pill" onclick="filterByBrand('OnePlus', this)">🚀 OnePlus</div>
+        </div>
+
+        <div class="section-header">
+            <span>🔥 Live Puja Stock Collection</span>
+            <span class="reset-filter" id="reset-filter-btn" onclick="filterByBrand('All', document.querySelector('.brand-pill'))">Reset</span>
+        </div>
+
+        <div class="phone-grid" id="home-phone-grid">
+            <div style="grid-column: span 2; text-align: center; color: var(--text-muted); padding: 30px;">Loading live stock...</div>
+        </div>
+
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active"><span>🏠</span>Home</a>
+            <a onclick="openProfileModal()" class="nav-item"><span>👤</span>Profile</a>
+            <a href="admin.html" class="nav-item"><span>⚙️</span>Admin</a>
+            <a href="tel:919088220753" class="nav-item"><span>💬</span>Contact</a>
+        </div>
+    </div>
+
+    <!-- DETAILS PAGE -->
+    <div id="detail-page">
+        <div class="detail-header">
+            <button class="back-home-btn" onclick="closeDetailPage()">⬅️ Back</button>
+            <h2 id="det-header-title" style="margin:0; font-size:16px; color:#fbbf24; font-weight:bold;">Phone Details</h2>
+        </div>
+        <div class="detail-body">
+            <div style="width:100%; height:260px; background:#0f172a; border-radius:12px; border:1px solid #334155; display:flex; align-items:center; justify-content:center; position:relative; margin-bottom:15px;">
+                <span id="det-badge" class="status-badge badge-avail" style="top:10px; left:10px;">Available</span>
+                <img id="det-image" src="" alt="Phone" style="max-width:100%; max-height:100%; object-fit:contain; padding:10px;">
+            </div>
+            <div style="background:#1e293b; padding:15px; border-radius:12px; margin-bottom:12px; border:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-size:10px; color:#94a3b8;">PUJA OFFER PRICE</div>
+                    <div id="det-price" style="font-size:22px; font-weight:bold; color:#fbbf24;">৳0</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:10px; color:#94a3b8;">REGULAR PRICE</div>
+                    <div id="det-oldprice" style="font-size:13px; color:#ef4444; text-decoration:line-through;">৳0</div>
+                </div>
+            </div>
+            <div style="background:#1e293b; padding:15px; border-radius:12px; margin-bottom:12px; border:1px solid #334155; font-size:12px;">
+                <h3 id="det-model" style="margin:0 0 8px 0; color:#fbbf24; font-size:15px;">Model</h3>
+                <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155;"><span style="color:#94a3b8;">RAM/ROM:</span> <span id="det-ram" style="color:white; font-weight:bold;">-</span></div>
+                <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #334155;"><span style="color:#94a3b8;">Color:</span> <span id="det-color" style="color:white; font-weight:bold;">-</span></div>
+                <div style="display:flex; justify-content:space-between; padding:5px 0;"><span style="color:#94a3b8;">Condition:</span> <span id="det-condition" style="color:white; font-weight:bold;">-</span></div>
+            </div>
+            <div style="background:#1e293b; padding:15px; border-radius:12px; margin-bottom:15px; border:1px solid #334155; font-size:12px;">
+                <div style="color:#fbbf24; font-weight:bold; margin-bottom:5px;">✨ Puja Gift & Highlights</div>
+                <p id="det-desc" style="margin:0; color:#cbd5e1; line-height:1.4; white-space: pre-line;">No details.</p>
+            </div>
+            <a href="tel:919088220753" style="display:block; background:#16a34a; color:white; text-align:center; padding:14px; border-radius:12px; font-weight:bold; text-decoration:none; font-size:15px;">📞 Call Shop Now</a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbwiDSo8tOQ7MwHO344Ij1DSb9cKUmf121PXUyrey7VeMH2_dcM6Tswwak6YUo37oDiB/exec";
+        let allGlobalPhones = [];
+        let currentSlide = 0;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            let savedName = localStorage.getItem('mobi_user_name');
+            let savedPhone = localStorage.getItem('mobi_user_phone');
+            if(savedName && savedPhone) {
+                document.getElementById('user-name-input').value = savedName;
+                document.getElementById('user-phone-input').value = savedPhone;
+                document.getElementById('auth-instruction-text').innerText = 'Welcome back, ' + savedName + '!';
+            }
+        });
+
+        function playSeraSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                [440, 554, 659, 880].forEach((f, i) => {
+                    let osc = ctx.createOscillator();
+                    let g = ctx.createGain();
+                    osc.frequency.value = f;
+                    g.gain.setValueAtTime(0.2, ctx.currentTime + (i*0.08));
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+                    osc.connect(g); g.connect(ctx.destination);
+                    osc.start(ctx.currentTime + (i*0.08)); osc.stop(ctx.currentTime + 1.3);
+                });
+            } catch(e){}
+        }
+
+        function handleAuthSubmit() {
+            let name = document.getElementById('user-name-input').value.trim();
+            let phone = document.getElementById('user-phone-input').value.trim();
+
+            if(!name || !phone) {
+                alert("Doya kore apnar Naam ebong Phone number din!");
+                return;
+            }
+
+            localStorage.setItem('mobi_user_name', name);
+            localStorage.setItem('mobi_user_phone', phone);
+
+            // Prottek bar app open hole login data Date/Time shoho Google Sheet-e save hobe
+            try {
+                fetch(API_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ type: 'user_login', name: name, phone: phone, time: new Date().toLocaleString() })
+                });
+            } catch(e){}
+
+            playSeraSound();
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('loading-animation-overlay').style.display = 'flex';
+
+            setTimeout(() => {
+                document.getElementById('loading-animation-overlay').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                document.getElementById('header-user-display').innerText = '👤 ' + name;
+                loadStoreData();
+            }, 2200);
+        }
+
+        function openProfileModal() {
+            document.getElementById('profile-name-edit').value = localStorage.getItem('mobi_user_name') || '';
+            document.getElementById('profile-phone-edit').value = localStorage.getItem('mobi_user_phone') || '';
+            document.getElementById('profile-modal').style.display = 'flex';
+        }
+
+        function saveProfileChanges() {
+            let name = document.getElementById('profile-name-edit').value.trim();
+            let phone = document.getElementById('profile-phone-edit').value.trim();
+            if(!name || !phone) { alert("Doya kore sothik nam ebong number din!"); return; }
+            localStorage.setItem('mobi_user_name', name);
+            localStorage.setItem('mobi_user_phone', phone);
+            document.getElementById('header-user-display').innerText = '👤 ' + name;
+            document.getElementById('profile-modal').style.display = 'none';
+            alert("Profile updated successfully!");
+        }
+
+        async function loadStoreData() {
+            try {
+                let res = await fetch(API_URL);
+                let data = await res.json();
+                let slider = document.getElementById('banner-slider');
+                let bannerWrapper = document.getElementById('main-banner-wrapper');
+
+                if (data.banners && data.banners.length > 0) {
+                    let bHtml = '';
+                    data.banners.forEach(link => {
+                        if(link && link.startsWith('http')) bHtml += `<img src="${link.trim()}" alt="Puja Banner">`;
+                    });
+                    if(bHtml) {
+                        slider.innerHTML = bHtml;
+                        bannerWrapper.style.display = 'block';
+                        if(slider.children.length > 1) startSlider();
+                    }
+                }
+                allGlobalPhones = data.phones || [];
+                displayPhones(allGlobalPhones);
+            } catch(e){}
+        }
+
+        function startSlider() {
+            setInterval(() => {
+                let slider = document.getElementById('banner-slider');
+                if(!slider || slider.children.length <= 1) return;
+                currentSlide = (currentSlide + 1) % slider.children.length;
+                slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+            }, 3500);
+        }
+
+        function filterByBrand(bName, el) {
+            document.querySelectorAll('.brand-pill').forEach(p => p.classList.remove('active-pill'));
+            if(el) el.classList.add('active-pill');
+            document.getElementById('search-input').value = '';
+            let resetBtn = document.getElementById('reset-filter-btn');
+            
+            if(bName === 'All') {
+                displayPhones(allGlobalPhones);
+                resetBtn.style.display = 'none';
+            } else {
+                let filtered = allGlobalPhones.filter(p => p.model && p.model.toLowerCase().includes(bName.toLowerCase()));
+                displayPhones(filtered);
+                resetBtn.style.display = 'inline-block';
+            }
+        }
+
+        function handleLiveSearch() {
+            let q = document.getElementById('search-input').value.toLowerCase().trim();
+            document.querySelectorAll('.brand-pill').forEach(p => p.classList.remove('active-pill'));
+            document.getElementById('reset-filter-btn').style.display = q ? 'inline-block' : 'none';
+            if(!q) { displayPhones(allGlobalPhones); return; }
+            let res = allGlobalPhones.filter(p => (p.model && p.model.toLowerCase().includes(q)) || (p.ramrom && p.ramrom.toLowerCase().includes(q)));
+            displayPhones(res);
+        }
+
+        function displayPhones(phones) {
+            let grid = document.getElementById('home-phone-grid');
+            if(!phones || phones.length === 0) {
+                grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color: var(--text-muted); padding: 30px; background:#1e293b; border-radius:12px;">❌ Kono phone paoya jayni!</div>`;
+                return;
+            }
+            let html = '';
+            phones.forEach((p) => {
+                let isSold = p.status === 'Sold Out';
+                let bClass = isSold ? 'badge-sold' : 'badge-avail';
+                let bText = isSold ? '🔴 SOLD' : '🪔 PUJA OFFER';
+                let origIdx = allGlobalPhones.indexOf(p);
+
+                html += `
+                    <div class="phone-card">
+                        <div class="phone-img-box" onclick="openDetail(${origIdx})">
+                            <span class="status-badge ${bClass}">${bText}</span>
+                            <img src="${p.image || 'https://i.ibb.co/3rW5Q6z/placeholder.jpg'}" alt="${p.model}">
+                        </div>
+                        <div class="phone-content" onclick="openDetail(${origIdx})">
+                            <h3 class="phone-title">${p.model}</h3>
+                            <div class="phone-ram">${p.ramrom || ''} | ${p.color || ''}</div>
+                            <div class="specs-mini">${p.description || 'Puja special gift available.'}</div>
+                            <div class="price-row">
+                                <span class="current-price">৳${p.price}</span>
+                                ${p.oldprice ? `<span class="old-price">৳${p.oldprice}</span>` : ''}
+                            </div>
+                        </div>
+                        <a href="https://wa.me/919088220753?text=I%20want%20to%20buy%20${encodeURIComponent(p.model)}" target="_blank" class="wa-btn">💬 Buy on WhatsApp</a>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        function openDetail(idx) {
+            let p = allGlobalPhones[idx];
+            if(!p) return;
+            document.getElementById('det-model').innerText = p.model;
+            document.getElementById('det-header-title').innerText = p.model;
+            document.getElementById('det-price').innerText = '৳' + p.price;
+            document.getElementById('det-oldprice').innerText = p.oldprice ? '৳' + p.oldprice : 'N/A';
+            document.getElementById('det-ram').innerText = p.ramrom || 'N/A';
+            document.getElementById('det-color').innerText = p.color || 'N/A';
+            document.getElementById('det-condition').innerText = p.condition || 'Fresh';
+            document.getElementById('det-desc').innerText = p.description || 'Special Puja offer with free gift!';
+            document.getElementById('det-image').src = p.image || 'https://i.ibb.co/3rW5Q6z/placeholder.jpg';
+            document.getElementById('detail-page').style.display = 'block';
+        }
+
+        function closeDetailPage() {
+            document.getElementById('detail-page').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
